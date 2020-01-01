@@ -3,6 +3,7 @@
 #region Commands
 
 #Get public and private function definition files.
+$Config = @( Get-ChildItem -Path $PSScriptRoot\Config\*.psd1 -ErrorAction SilentlyContinue )
 $Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
 $Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )
 
@@ -10,6 +11,15 @@ $Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction Silen
 Foreach ($import in @($Public + $Private)) {
   Try {
     . $import.fullname
+  }
+  Catch {
+    Write-Error -Message "Failed to import function $($import.fullname): $_"
+  }
+}
+
+Foreach ($import in @($Config)) {
+  Try {
+    Import-PowerShellDataFile .\$import.fullname
   }
   Catch {
     Write-Error -Message "Failed to import function $($import.fullname): $_"

@@ -113,7 +113,7 @@ Get-Process
 
             [string]$app = $process.MainWindowTitle 
 
-            if ( (-Not $app) -AND $process.MainModule.Description ) {
+            if ( (-Not $app) -and $process.MainModule.Description ) {
                 #if no title but there is a description, use that
                 $app = $process.MainModule.Description
             }
@@ -122,7 +122,7 @@ Get-Process
                 $app = $process.mainmodule.modulename
             }
       
-            if ($process -AND (($Process.MainWindowHandle -ne $LastProcess.MainWindowHandle) -OR ($app -ne $lastApp )) ) {
+            if ($process -and (($Process.MainWindowHandle -ne $LastProcess.MainWindowHandle) -or ($app -ne $lastApp )) ) {
                 Write-Verbose "[$(Get-Date)] NEW App changed to $app"
         
                 #record $last
