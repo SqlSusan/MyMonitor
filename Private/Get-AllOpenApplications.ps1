@@ -14,20 +14,10 @@ Handles  NPM(K)    PM(K)      WS(K) VM(M)   CPU(s)     Id ProcessName
 
 .Notes
 
-Learn more about PowerShell:
-http://jdhitsolutions.com/blog/essential-powershell-resources/
-
-
-  ****************************************************************
-  * DO NOT USE IN A PRODUCTION ENVIRONMENT UNTIL YOU HAVE TESTED *
-  * THOROUGHLY IN A LAB ENVIRONMENT. USE AT YOUR OWN RISK.  IF   *
-  * YOU DO NOT UNDERSTAND WHAT THIS SCRIPT DOES OR HOW IT WORKS, *
-  * DO NOT USE IT OUTSIDE OF A SECURE, TEST SETTING.             *
-  ****************************************************************
 .Link
 Get-Process
 #>
-function Get-ForegroundWindowProcess {
+function Get-AllOpenApplications {
     [cmdletbinding()]
     Param()
 
@@ -61,6 +51,12 @@ any Task Switch windows
                                 -and $_.MainWindowHandle -ne 0 `
                                 -and $_.Name -ne 'Explorer' `
                                 -and $_.Title -notmatch "Task Switching" })
+
+                                Get-Process | select Name, ProcessName, MainWindowTitle, MainModule, StartTime, ExitTime, Responding `
+                                            | where {$_.MainWindowHandle -ne 0}
+
+(gwmi win32_service).PathName | select-object {$_.Split('\')[-1].Split(" ")[0]} `
+                                | sort-object -Unique
 
 
 } #end Get-ForegroundWindowProcess

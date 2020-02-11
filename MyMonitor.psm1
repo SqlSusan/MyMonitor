@@ -1,29 +1,19 @@
 ﻿#requires -version 5.0
 
 
-      [pscustomObject]$detail = @{
-          StartTime = $start
-          EndTime   = Get-Date
-          ProcessID = $lastProcess.ID
-          Process   = if ($LastProcess) { $LastProcess } else { $process }
-      }
-
 class processes {
   [ValidateNotNullOrEmpty()][datetime]$StartTime
   [ValidateNotNullOrEmpty()][datetime]$EndTime
   [ValidateNotNullOrEmpty()][int]$ProcessID
   [ValidateNotNullOrEmpty()][string]$Process
 
-  processes($StartTime, $ProcessID, $Process) {
+  processes($StartTime, $LastProcess, $process) {
       $this.StartTime = $StartTime 
       $this.EndTime = Get-Date
-      $this.ProcessID = $ProcessID 
-      $this.Process = $Process  
+      $this.ProcessID = $lastProcess.ID
+      $this.Process = if ($LastProcess) { $LastProcess } else { $process }
   }
 }
-
-$obj = [processes]::New("02/02/2020",1,"Something")
-
 
 
 #region Commands
