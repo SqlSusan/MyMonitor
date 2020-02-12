@@ -28,6 +28,72 @@ function Get-AllOpenApplications {
     catch {
         #type not found so add it
 
+        $TypeDef = @"
+
+using System;
+using System.Text;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+
+namespace Api
+{
+
+ public class WinStruct
+ {
+   public string WinTitle {get; set; }
+   public int WinHwnd { get; set; }
+ }
+
+ public class ApiDef
+ {
+   private delegate bool CallBackPtr(int hwnd, int lParam);
+   private static CallBackPtr callBackPtr = Callback;
+   private static List<WinStruct> _WinStructList = new List<WinStruct>();
+
+   [DllImport("User32.dll")]
+   [return: MarshalAs(UnmanagedType.Bool)]
+   private static extern bool EnumWindows(CallBackPtr lpEnumFunc, IntPtr lParam);
+
+    [DllImport("User32.dll")]
+   [return: MarshalAs(UnmanagedType.Bool)]
+   private static extern bool IsWindow(int hWnd);
+
+   [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+   static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+   private static bool Callback(int hWnd, int lparam)
+   {
+        if (IsWindow(hWnd))
+        {
+            StringBuilder sb = new StringBuilder(256);
+            int res = GetWindowText((IntPtr)hWnd, sb, 256);
+            if (res.Length() > 0)
+            {
+                _WinStructList.Add(new WinStruct { WinHwnd = hWnd, WinTitle = sb.ToString() });
+            }
+        }
+        return true;
+   }   
+
+   public static List<WinStruct> GetWindows()
+   {
+      _WinStructList = new List<WinStruct>();
+      EnumWindows(callBackPtr, IntPtr.Zero);
+      return _WinStructList;
+   }
+
+ }
+}
+"@
+        $loaded = [appdomain]::currentdomain.getassemblies()   
+        Add-Type -TypeDefinition $TypeDef -Language CSharpVersion3
+
+        [Api.Apidef]::GetWindows() | `
+         Select-Object WinTitle, @{Name = "Handle"; Expression = { "{0:X0}" -f $_.WinHwnd}} | `
+         fl
+
+ 
+
         Add-Type -typeDefinition @"
         using System;
         using System.Runtime.InteropServices;
@@ -41,11 +107,19 @@ function Get-AllOpenApplications {
         #must left justify here-string closing @
     } #catch
 
+
+
     <#
 get the process for the currently active foreground window as long as it has a value
 greater than 0. A value of 0 typically means a non-interactive window. Also ignore
 any Task Switch windows
 #>
+$service_exes = (gwmi win32_service).PathName | `
+                                select-object @{N = "PathName"; E = {$_.Split('\')[-1].Split(" ")[0]}} `
+                                | group-object {$_.PathName} `
+                                | %{ $_.Name.Replace('"', "").Replace('.exe', "") }
+
+    [user32].GetGenericArguments()
 
     (Get-Process).where( { $_.MainWindowHandle -eq ([user32]::GetForegroundWindow()) `
                                 -and $_.MainWindowHandle -ne 0 `
@@ -53,10 +127,10 @@ any Task Switch windows
                                 -and $_.Title -notmatch "Task Switching" })
 
                                 Get-Process | select Name, ProcessName, MainWindowTitle, MainModule, StartTime, ExitTime, Responding `
-                                            | where {$_.MainWindowHandle -ne 0}
+                                            | where {$_.MainWindowHandle -ne 0 `
+                                                    -and $_.ProcessName -notin $service_exes}
+    @{ Name = ''; Expression = { } }
 
-(gwmi win32_service).PathName | select-object {$_.Split('\')[-1].Split(" ")[0]} `
-                                | sort-object -Unique
-
+    $service_exes | %{ $_.Name.Replace('"', "").Replace('.exe', "") }
 
 } #end Get-ForegroundWindowProcess
