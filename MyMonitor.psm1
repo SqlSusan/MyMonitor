@@ -1,21 +1,5 @@
 ﻿#requires -version 5.0
 
-
-class processes {
-  [ValidateNotNullOrEmpty()][datetime]$StartTime
-  [ValidateNotNullOrEmpty()][datetime]$EndTime
-  [ValidateNotNullOrEmpty()][int]$ProcessID
-  [ValidateNotNullOrEmpty()][string]$Process
-
-  processes($StartTime, $LastProcess, $process) {
-      $this.StartTime = $StartTime 
-      $this.EndTime = Get-Date
-      $this.ProcessID = $lastProcess.ID
-      $this.Process = if ($LastProcess) { $LastProcess } else { $process }
-  }
-}
-
-
 #region Commands
 
 #Get public and private function definition files.

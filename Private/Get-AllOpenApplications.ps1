@@ -67,7 +67,7 @@ namespace Api
         {
             StringBuilder sb = new StringBuilder(256);
             int res = GetWindowText((IntPtr)hWnd, sb, 256);
-            if (res.Length() > 0)
+            if (sb.Length > 0)
             {
                 _WinStructList.Add(new WinStruct { WinHwnd = hWnd, WinTitle = sb.ToString() });
             }
@@ -85,7 +85,7 @@ namespace Api
  }
 }
 "@
-        $loaded = [appdomain]::currentdomain.getassemblies()   
+           
         Add-Type -TypeDefinition $TypeDef -Language CSharpVersion3
 
         [Api.Apidef]::GetWindows() | `

@@ -104,23 +104,15 @@ Get-Process
 
         #create a collection of objects
         $objs = @()
+        $LastApp = $null
+        #New-Variable -Name LastApp -Value $Null
 
-        New-Variable -Name LastApp -Value $Null
-
+        
         while ( -Not (&$sb) ) {
-
             $Process = Get-ForegroundWindowProcess
 
-            [string]$app = $process.MainWindowTitle 
-
-            if ( (-Not $app) -and $process.MainModule.Description ) {
-                #if no title but there is a description, use that
-                $app = $process.MainModule.Description
-            }
-            elseif (-Not $app) {
-                #otherwise use the module name
-                $app = $process.mainmodule.modulename
-            }
+            #try to cleanup the application name
+            $app = Get-ApplicationName -Process $Process
       
             if ($process -and (($Process.MainWindowHandle -ne $LastProcess.MainWindowHandle) -or ($app -ne $lastApp )) ) {
                 Write-Verbose "[$(Get-Date)] NEW App changed to $app"

@@ -56,11 +56,14 @@ get the process for the currently active foreground window as long as it has a v
 greater than 0. A value of 0 typically means a non-interactive window. Also ignore
 any Task Switch windows
 #>
+    $ForegroundWindow = [foregroundwindow]::New()
+    $ForegroundWindow = (Get-Process).where( { $_.MainWindowHandle -eq ([user32]::GetForegroundWindow()) `
+                -and $_.MainWindowHandle -ne 0 `
+                -and $_.Name -ne 'Explorer' `
+                -and $_.Title -notmatch "Task Switching" }) | `
+        Select-Object MainWindowHandle, WindowTitle, ID, StartTime, Company, ProductVersion, MainModule
 
-    (Get-Process).where( { $_.MainWindowHandle -eq ([user32]::GetForegroundWindow()) `
-                                -and $_.MainWindowHandle -ne 0 `
-                                -and $_.Name -ne 'Explorer' `
-                                -and $_.Title -notmatch "Task Switching" })
+    return $ForegroundWindow
 
 
 } #end Get-ForegroundWindowProcess
