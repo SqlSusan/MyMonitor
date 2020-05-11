@@ -1,11 +1,23 @@
 ﻿#requires -version 5.0
 
 #region Commands
+if ($psISE) {
+    $PathToScript = Split-Path -Path $psISE.CurrentFile.FullPath
+}
+else {
+  if ($profile -match "VScode") {
+      $PathToScript = split-path $psEditor.GetEditorContext().CurrentFile.Path
+  } 
+  else {
+      $PathToScript = $PSScriptRoot
+      
+  }
+}
 
 #Get public and private function definition files.
-$Config = @( Get-ChildItem -Path $PSScriptRoot\Config\*.psd1 -ErrorAction SilentlyContinue )
-$Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
-$Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )
+$Config = @( Get-ChildItem -Path $PathToScript\Config\*.psd1 -ErrorAction SilentlyContinue )
+$Public = @( Get-ChildItem -Path $PathToScript\Public\*.ps1 -ErrorAction SilentlyContinue )
+$Private = @( Get-ChildItem -Path $PathToScript\Private\*.ps1 -ErrorAction SilentlyContinue )
 
 #Dot source the files
 Foreach ($import in @($Public + $Private)) {
@@ -19,7 +31,7 @@ Foreach ($import in @($Public + $Private)) {
 
 Foreach ($import in @($Config)) {
   Try {
-    Import-PowerShellDataFile .\$import.fullname
+    Import-PowerShellDataFile $import.fullname
   }
   Catch {
     Write-Error -Message "Failed to import function $($import.fullname): $_"
@@ -61,7 +73,7 @@ file in future module updates.
 #>
 
 $localXML = Join-Path -Path $env:USERPROFILE -ChildPath "Documents\WindowsPowerShell\Categories.xml"
-$modXML = Join-Path -path $PSScriptroot -ChildPath categories.xml
+$modXML = Join-Path -path $PSScriptRoot\Config -ChildPath categories.xml
 
 if (Test-Path -path $localXML) {
     [xml]$MonitorCategories = Get-Content -Path $localXML
