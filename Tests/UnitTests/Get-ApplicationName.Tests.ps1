@@ -1,6 +1,15 @@
 Describe "Get-ApplicationName" -Tags 'Unit' {
     Context "Get-ApplicationName" {
-        Mock -
-        it -Name "Returned results" -Test { Get-ApplicationName | Should -Not -BeNullOrEmpty}
+        $Process = Get-ForegroundWindowProcess
+        it -Name "Returned results" -Test { Get-ApplicationName -Process $Process | Should -Not -BeNullOrEmpty}
+    } #EndContext
+
+    Context "Get-ApplicationName with mocks" -Tag "Integration" {
+        Mock Get-ForegroundWindowProcess {
+
+        }
+        $Process = Get-ForegroundWindowProcess
+        it -Name "Returned results" -Test { Get-ApplicationName -Process $Process | Should -Not -BeNullOrEmpty }
     } #EndContext
 }
+

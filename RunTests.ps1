@@ -7,5 +7,8 @@ import-module pester -RequiredVersion 4.10.1
 Invoke-Pester -Tag bootstrap
 #Invoke-Pester -Tag Unit
 
+
+. .\Tests\UnitTests\Get-ForegroundWindowHandle.Tests.ps1
 . .\Tests\UnitTests\Get-ForegroundWindowProcess.Tests.ps1
+. .\Tests\UnitTests\Get-ApplicationName.Tests.ps1
 

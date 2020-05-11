@@ -3,7 +3,7 @@ Describe "Get-ForegroundWindowProcess" -Tags 'Unit' {
     Mock -CommandName Get-Process `
     -MockWith { [PSCustomObject]@{
         "MainWindowHandle" = 1246558
-        "WindowTitle"      = ""
+        "MainWindowTitle"      = "Get-ForegroundWindowProcess.ps1 - MyMonitor (Workspace) - Visual Studio Code"
         "Id"               = 9776
         "StartTime"        = (Get-Date).AddMinutes(-25)
         "Company"          = "Microsoft Corporation"
@@ -29,7 +29,7 @@ Mock -CommandName Get-ForegroundWindowHandle -MockWith { 1246558 } -Verifiable
 
         It -Name "Returned results" -Test { (,$ForegroundWindow).Count | Should -BeGreaterThan 0 }
         It -Name "MainWindowHandle" -Test { $ForegroundWindow.MainWindowHandle | Should -be 1246558 }
-        It -Name "WindowTitle" -Test { $ForegroundWindow.WindowTitle | Should -Be "" }
+        It -Name "WindowTitle" -Test { $ForegroundWindow.MainWindowTitle | Should -Be "Get-ForegroundWindowProcess.ps1 - MyMonitor (Workspace) - Visual Studio Code" }
         It -Name "Id" -Test { $ForegroundWindow.Id | Should -Be 9776 }
         It -Name "StartTime" -Test { $ForegroundWindow.StartTime | Should -BeLessThan (Get-Date).AddMinutes(-25) }
         It -Name "Company" -Test { $ForegroundWindow.Company | Should -Be "Microsoft Corporation" }

@@ -30,11 +30,11 @@ greater than 0. A value of 0 typically means a non-interactive window. Also igno
 any Task Switch windows
 #>
     $ForegroundWindow = [foregroundwindow]::New()
-    $ForegroundWindow = (Get-Process) | Where-Object {( { $_.MainWindowHandle -eq (Get-ForegroundWindowHandle) `
+    $ForegroundWindow = (Get-Process) | Where-Object { $_.MainWindowHandle -eq (Get-ForegroundWindowHandle) `
                 -and $_.MainWindowHandle -ne 0 `
                 -and $_.Name -ne 'Explorer' `
-                -and $_.Title -notmatch "Task Switching" })} | `
-        Select-Object MainWindowHandle, WindowTitle, ID, StartTime, Company, ProductVersion, MainModule
+                -and $_.Title -notmatch "Task Switching" } | `
+        Select-Object MainWindowHandle, MainWindowTitle, ID, StartTime, Company, ProductVersion, MainModule
 
     return $ForegroundWindow
 

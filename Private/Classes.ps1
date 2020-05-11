@@ -34,7 +34,7 @@ class processreport {
 
 class foregroundwindow {
     [string]$MainWindowHandle
-    [string]$WindowTitle
+    [string]$MainWindowTitle
     [ValidateNotNullOrEmpty()][int]$ID
     [ValidateNotNullOrEmpty()][datetime]$StartTime
     [string]$Company
